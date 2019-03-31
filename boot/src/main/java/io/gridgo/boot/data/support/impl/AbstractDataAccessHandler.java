@@ -33,7 +33,7 @@ public abstract class AbstractDataAccessHandler<T extends Annotation> implements
             return Promise.ofCause(new IllegalArgumentException(String.format("Method %s is not annotated with @%s",
                     proxy.getClass().getName(), method.getName(), annotatedClass.getSimpleName())));
         }
-        var msg = buildMessage(annotation, args);
+        var msg = buildMessage(annotation, method, args);
         return filter(method, gateway.call(msg));
     }
 
@@ -45,5 +45,5 @@ public abstract class AbstractDataAccessHandler<T extends Annotation> implements
         return promise.filterDone(r -> toPojo(r, pojo));
     }
 
-    protected abstract Message buildMessage(T annotation, Object[] args);
+    protected abstract Message buildMessage(T annotation, Method method, Object[] args);
 }

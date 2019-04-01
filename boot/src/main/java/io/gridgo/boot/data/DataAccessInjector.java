@@ -95,8 +95,7 @@ public class DataAccessInjector implements Injector {
             var instance = handler.getConstructor().newInstance();
             instance.setContext(context);
             instance.setGateway(context.findGatewayMandatory(targetGateway));
-            return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class[] { proxyClass },
-                    instance);
+            return Proxy.newProxyInstance(proxyClass.getClassLoader(), new Class[] { proxyClass }, instance);
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
                 | NoSuchMethodException | SecurityException e) {
             throw new InitializationException("Cannot inject data access layer", e);

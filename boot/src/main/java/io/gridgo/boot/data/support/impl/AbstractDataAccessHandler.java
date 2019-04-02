@@ -8,7 +8,7 @@ import org.joo.promise4j.Promise;
 import io.gridgo.boot.data.DataAccessHandler;
 import io.gridgo.boot.data.PojoConverter;
 import io.gridgo.boot.data.support.annotations.PojoMapper;
-import io.gridgo.core.Gateway;
+import io.gridgo.connector.support.MessageProducer;
 import io.gridgo.core.GridgoContext;
 import io.gridgo.framework.support.Message;
 import lombok.Data;
@@ -18,7 +18,7 @@ public abstract class AbstractDataAccessHandler<T extends Annotation> implements
 
     protected GridgoContext context;
 
-    protected Gateway gateway;
+    protected MessageProducer gateway;
 
     private final Class<? extends T> annotatedClass;
 

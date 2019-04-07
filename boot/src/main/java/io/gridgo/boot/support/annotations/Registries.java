@@ -14,4 +14,6 @@ public @interface Registries {
     Class<? extends Registry>[] registries() default {};
     
     String defaultProfile() default "";
+    
+    String configPath() default "config";
 }

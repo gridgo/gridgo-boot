@@ -23,14 +23,16 @@ public class AnnotatedRegistry implements Registry {
 
     private Registry extractRegistryFromAnnotation(Class<?> applicationClass) {
         var registries = new ArrayList<Registry>();
-        String defaultProfile = null;
+        String defaultProfile = null, configPath = null;
         var annotation = applicationClass.getAnnotation(Registries.class);
         if (annotation != null) {
             registries.addAll(getRegistriesFromClassAnnotation(annotation));
             defaultProfile = annotation.defaultProfile();
+            configPath = annotation.configPath();
         }
         registries.addAll(getAllMethodsWithAnnotations(applicationClass));
         return new RegistryBuilder().setDefaultProfile(defaultProfile) //
+                                    .setConfigPath(configPath) //
                                     .setRegistries(registries.toArray(new Registry[0])) //
                                     .build();
     }

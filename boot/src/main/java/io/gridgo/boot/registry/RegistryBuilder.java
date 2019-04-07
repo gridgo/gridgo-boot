@@ -14,8 +14,12 @@ import io.gridgo.framework.support.impl.SystemPropertyRegistry;
 public class RegistryBuilder implements Builder<Registry> {
 
     private static final String APP_PROPERTIES_FILE = "application.properties";
-    
+
+    private static final String DEFAULT_CONFIG_PATH = "config";
+
     private String defaultProfile;
+
+    private String configPath;
 
     private Registry[] registries;
 
@@ -27,7 +31,7 @@ public class RegistryBuilder implements Builder<Registry> {
     @Override
     public Registry build() {
         var registries = new ArrayList<Registry>();
-        
+
         if (this.registries != null)
             registries.addAll(Arrays.asList(this.registries));
 
@@ -45,7 +49,8 @@ public class RegistryBuilder implements Builder<Registry> {
     }
 
     private String getConfigFile(String envFile) {
-        return "config/" + envFile;
+        var directory = configPath != null ? configPath : DEFAULT_CONFIG_PATH;
+        return directory + "/" + envFile;
     }
 
     private String getProfile() {
@@ -60,6 +65,11 @@ public class RegistryBuilder implements Builder<Registry> {
 
     public RegistryBuilder setRegistries(Registry[] registries) {
         this.registries = registries;
+        return this;
+    }
+
+    public RegistryBuilder setConfigPath(String configPath) {
+        this.configPath = configPath;
         return this;
     }
 }

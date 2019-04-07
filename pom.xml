@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>gridgo-boot-base</artifactId>
 	<packaging>pom</packaging>
-	<version>0.5.0-SNAPSHOT</version>
+	<version>0.5.0</version>
 
 	<parent>
 		<groupId>io.gridgo</groupId>
@@ -15,9 +15,10 @@
 	<modules>
 		<module>boot</module>
 	</modules>
-	
+
 	<properties>
 		<gridgo.version>0.5.0</gridgo.version>
+		<junit.version>4.12</junit.version>
 	</properties>
 
 	<dependencies>
@@ -41,5 +42,15 @@
 			<artifactId>log4j-slf4j-impl</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
+
+	<scm>
+		<tag>gridgo-boot-base-0.5.0</tag>
+	</scm>
 </project>

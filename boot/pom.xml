@@ -32,7 +32,7 @@
 		<dependency>
 			<groupId>io.gridgo</groupId>
 			<artifactId>gridgo-jdbc</artifactId>
-			<version>${project.version}</version>
+			<version>${gridgo.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

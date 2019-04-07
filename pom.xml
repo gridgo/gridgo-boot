@@ -15,12 +15,16 @@
 	<modules>
 		<module>boot</module>
 	</modules>
+	
+	<properties>
+		<gridgo.version>0.5.0</gridgo.version>
+	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>io.gridgo</groupId>
 			<artifactId>gridgo-core</artifactId>
-			<version>${project.version}</version>
+			<version>${gridgo.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.gridgo</groupId>

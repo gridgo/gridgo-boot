@@ -15,17 +15,17 @@
 		<dependency>
 			<groupId>io.gridgo</groupId>
 			<artifactId>gridgo-core</artifactId>
-			<version>${project.version}</version>
+			<version>${gridgo.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.gridgo</groupId>
 			<artifactId>gridgo-extras-typesafe</artifactId>
-			<version>${project.version}</version>
+			<version>${gridgo.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.gridgo</groupId>
 			<artifactId>gridgo-extras-yaml</artifactId>
-			<version>${project.version}</version>
+			<version>${gridgo.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>

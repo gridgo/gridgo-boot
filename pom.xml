@@ -51,6 +51,9 @@
 	</dependencies>
 
 	<scm>
-		<tag>gridgo-boot-base-0.5.0</tag>
+		<url>https://github.com/gridgo/gridgo-boot.git</url>
+		<developerConnection>scm:git:[fetch=]https://github.com/gridgo/gridgo-boot.git</developerConnection>
+		<connection>scm:git:[fetch=]https://github.com/gridgo/gridgo-boot.git</connection>
+		<tag>HEAD</tag>
 	</scm>
 </project>

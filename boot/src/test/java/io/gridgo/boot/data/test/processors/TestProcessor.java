@@ -7,7 +7,6 @@ import io.gridgo.boot.support.annotations.Gateway;
 import io.gridgo.core.GridgoContext;
 import io.gridgo.core.impl.AbstractProcessor;
 import io.gridgo.core.support.RoutingContext;
-import io.gridgo.framework.support.Message;
 import lombok.Setter;
 
 @Setter
@@ -23,7 +22,7 @@ public class TestProcessor extends AbstractProcessor {
     @Override
     public void process(RoutingContext rc, GridgoContext gc) {
         userService.createAndSaveUser() //
-                   .<Message, Exception>filterDone(transformer::transform) //
+                   .map(transformer::transform) //
                    .forward(rc.getDeferred());
     }
 }

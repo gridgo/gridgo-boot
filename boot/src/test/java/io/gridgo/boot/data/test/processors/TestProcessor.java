@@ -20,15 +20,15 @@ public class TestProcessor extends AbstractProcessor {
     private UserDAO userDAO;
 
     @ComponentInject
-    private UserDomainService repo;
+    private UserDomainService userService;
 
     @ComponentInject("${transformer}")
     private Transformer transformer;
 
     @Override
     public void process(RoutingContext rc, GridgoContext gc) {
-        repo.createAndSaveUser() //
-            .<Message, Exception>filterDone(transformer::transform) //
-            .forward(rc.getDeferred());
+        userService.createAndSaveUser() //
+                   .<Message, Exception>filterDone(transformer::transform) //
+                   .forward(rc.getDeferred());
     }
 }

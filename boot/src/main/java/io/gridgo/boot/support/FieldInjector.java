@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.gridgo.boot.data.DataAccessInjector;
+import io.gridgo.boot.support.injectors.impl.ComponentInjector;
 import io.gridgo.boot.support.injectors.impl.GatewayInjector;
 import io.gridgo.boot.support.injectors.impl.RegistryInjector;
 import io.gridgo.core.GridgoContext;
@@ -16,6 +17,7 @@ public class FieldInjector {
         this.injectors = Arrays.asList( //
                 new RegistryInjector(context), //
                 new GatewayInjector(context), //
+                new ComponentInjector(context), //
                 new DataAccessInjector(context));
     }
 

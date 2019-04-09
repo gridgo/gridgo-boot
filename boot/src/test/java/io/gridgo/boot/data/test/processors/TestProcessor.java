@@ -1,10 +1,10 @@
 package io.gridgo.boot.data.test.processors;
 
-import java.util.List;
-
 import io.gridgo.boot.data.support.annotations.DataAccessInject;
-import io.gridgo.boot.data.test.data.User;
+import io.gridgo.boot.data.test.data.UserDomainService;
 import io.gridgo.boot.data.test.data.UserDAO;
+import io.gridgo.boot.data.test.transformers.Transformer;
+import io.gridgo.boot.support.annotations.ComponentInject;
 import io.gridgo.boot.support.annotations.Gateway;
 import io.gridgo.core.GridgoContext;
 import io.gridgo.core.impl.AbstractProcessor;
@@ -19,17 +19,16 @@ public class TestProcessor extends AbstractProcessor {
     @DataAccessInject
     private UserDAO userDAO;
 
+    @ComponentInject
+    private UserDomainService repo;
+
+    @ComponentInject("${transformer}")
+    private Transformer transformer;
+
     @Override
     public void process(RoutingContext rc, GridgoContext gc) {
-        userDAO.dropTable() //
-               .pipeDone(r -> userDAO.createTable()) //
-               .pipeDone(r -> userDAO.add(1, "hello")) //
-               .pipeDone(r -> userDAO.find(1)) //
-               .<Message, Exception>filterDone(this::transform) //
-               .forward(rc.getDeferred());
-    }
-
-    private Message transform(List<User> r) {
-        return Message.ofAny((r.isEmpty()) ? null : r.get(0));
+        repo.createAndSaveUser() //
+            .<Message, Exception>filterDone(transformer::transform) //
+            .forward(rc.getDeferred());
     }
 }

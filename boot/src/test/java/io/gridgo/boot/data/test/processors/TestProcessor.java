@@ -1,8 +1,6 @@
 package io.gridgo.boot.data.test.processors;
 
-import io.gridgo.boot.data.support.annotations.DataAccessInject;
 import io.gridgo.boot.data.test.data.UserDomainService;
-import io.gridgo.boot.data.test.data.UserDAO;
 import io.gridgo.boot.data.test.transformers.Transformer;
 import io.gridgo.boot.support.annotations.ComponentInject;
 import io.gridgo.boot.support.annotations.Gateway;
@@ -15,9 +13,6 @@ import lombok.Setter;
 @Setter
 @Gateway("test")
 public class TestProcessor extends AbstractProcessor {
-
-    @DataAccessInject
-    private UserDAO userDAO;
 
     @ComponentInject
     private UserDomainService userService;

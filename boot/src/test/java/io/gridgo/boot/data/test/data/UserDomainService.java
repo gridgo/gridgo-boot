@@ -18,10 +18,10 @@ public class UserDomainService {
 
     public Promise<Message, Exception> createAndSaveUser() {
         return userDAO.dropTable() //
-                      .pipeDone(r -> userDAO.createTable()) //
-                      .pipeDone(r -> userDAO.add(1, "hello")) //
-                      .pipeDone(r -> userDAO.find(1)) //
-                      .filterDone(this::transform);
+                      .then(r -> userDAO.createTable()) //
+                      .then(r -> userDAO.add(1, "hello")) //
+                      .then(r -> userDAO.find(1)) //
+                      .map(this::transform);
     }
 
     private Message transform(List<User> r) {

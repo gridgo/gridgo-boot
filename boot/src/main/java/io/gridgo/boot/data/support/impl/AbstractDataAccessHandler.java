@@ -3,6 +3,8 @@ package io.gridgo.boot.data.support.impl;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
+import io.gridgo.bean.BElement;
+import io.gridgo.boot.data.support.annotations.SingleMapper;
 import org.joo.promise4j.Promise;
 
 import io.gridgo.boot.data.DataAccessHandler;
@@ -33,16 +35,28 @@ public abstract class AbstractDataAccessHandler<T extends Annotation> implements
             return Promise.ofCause(new IllegalArgumentException(String.format("Method %s is not annotated with @%s",
                     proxy.getClass().getName(), method.getName(), annotatedClass.getSimpleName())));
         }
-        var msg = buildMessage(annotation, method, args);
-        return filter(method, gateway.call(msg));
+        var msgRequest = buildMessage(annotation, method, args);
+        var msgResult = gateway.call(msgRequest);
+        return msgResult.filterDone(r -> filterSingleMapper(method, r))
+                .filterDone(r -> filterPojoMapper(method, r));
     }
 
-    protected Promise<?, Exception> filter(Method method, Promise<Message, Exception> promise) {
+    protected Object filterSingleMapper(Method method, Message result) {
+        var annotation = method.getAnnotation(SingleMapper.class);
+        if (annotation == null)
+            return result;
+        return result.body().isArray()
+                ? result.body().asArray().iterator().next() : result.body();
+    }
+
+    protected Object filterPojoMapper(Method method, Object result) {
         var annotation = method.getAnnotation(PojoMapper.class);
         if (annotation == null)
-            return promise;
+            return result;
         var pojo = annotation.value();
-        return promise.filterDone(r -> toPojo(r, pojo));
+        if (result instanceof Message)
+            return toPojo(((Message) result).body(), pojo);
+        return toPojo((BElement) result, pojo);
     }
 
     protected abstract Message buildMessage(T annotation, Method method, Object[] args);

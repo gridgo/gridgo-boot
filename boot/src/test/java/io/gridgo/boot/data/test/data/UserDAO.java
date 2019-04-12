@@ -2,6 +2,7 @@ package io.gridgo.boot.data.test.data;
 
 import java.util.List;
 
+import io.gridgo.boot.data.support.annotations.SingleMapper;
 import org.joo.promise4j.Promise;
 
 import io.gridgo.boot.data.jdbc.JdbcProduce;
@@ -24,6 +25,12 @@ public interface UserDAO {
     @PojoMapper(User.class)
     @JdbcProduce(value = "select * from test_users where id = :1")
     public Promise<List<User>, Exception> find(int id);
+
+
+    @PojoMapper(User.class)
+    @SingleMapper
+    @JdbcProduce(value = "select * from test_users where id = :1")
+    public Promise<User, Exception> findSingle(int id);
 
     @PojoMapper(User.class)
     @JdbcProduce(value = "select * from test_users where id in (:1)")

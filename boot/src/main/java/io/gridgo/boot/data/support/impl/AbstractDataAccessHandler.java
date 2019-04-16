@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 import io.gridgo.bean.BElement;
+import io.gridgo.bean.BObject;
 import io.gridgo.boot.data.support.annotations.SingleMapper;
 import org.joo.promise4j.Promise;
 
@@ -45,8 +46,12 @@ public abstract class AbstractDataAccessHandler<T extends Annotation> implements
         var annotation = method.getAnnotation(SingleMapper.class);
         if (annotation == null)
             return result;
-        return result.body().isArray()
-                ? result.body().asArray().iterator().next() : result.body();
+        if(result.body().isArray()){
+            var array = result.body().asArray();
+            return array.isEmpty() ? null : array.get(0);
+        }else {
+            return result.body();
+        }
     }
 
     protected Object filterPojoMapper(Method method, Object result) {

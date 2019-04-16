@@ -11,6 +11,9 @@ import io.gridgo.framework.support.Message;
 public interface PojoConverter {
 
     public default Object toPojo(BElement body, Class<?> pojo) {
+        if (body == null){
+            return null;
+        }
         if (body.isObject()) {
             return toPojoObject(pojo, body.asObject());
         } else if (body.isArray()) {

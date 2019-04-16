@@ -20,6 +20,7 @@ public class UserDomainService {
         return userDAO.dropTable() //
                       .then(r -> userDAO.createTable()) //
                       .then(r -> userDAO.add(1, "hello")) //
+                      .then(r -> userDAO.findSingle(2)) //
                       .then(r -> userDAO.findSingle(1)) //
                       .map(Message::ofAny);
     }

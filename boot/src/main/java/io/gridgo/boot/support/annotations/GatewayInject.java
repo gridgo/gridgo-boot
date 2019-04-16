@@ -9,5 +9,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface GatewayInject {
 
-    String value();
+    String value() default "";
+
+    Class clazz() default DEFAULT.class;
+
+    final class DEFAULT {}
 }

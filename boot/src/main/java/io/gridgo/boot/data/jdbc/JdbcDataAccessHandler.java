@@ -6,7 +6,6 @@ import io.gridgo.bean.BObject;
 import io.gridgo.boot.data.support.annotations.DataAccessSchema;
 import io.gridgo.boot.data.support.impl.AbstractDataAccessHandler;
 import io.gridgo.framework.support.Message;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 
 @DataAccessSchema("jdbc")

@@ -1,7 +1,5 @@
 package io.gridgo.boot.data.test.data;
 
-import java.util.List;
-
 import org.joo.promise4j.Promise;
 
 import io.gridgo.boot.data.support.annotations.DataAccessInject;

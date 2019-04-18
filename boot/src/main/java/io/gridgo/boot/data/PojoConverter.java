@@ -6,21 +6,18 @@ import java.util.List;
 import io.gridgo.bean.BArray;
 import io.gridgo.bean.BElement;
 import io.gridgo.bean.BObject;
-import io.gridgo.framework.support.Message;
 
 public interface PojoConverter {
 
     public default Object toPojo(BElement body, Class<?> pojo) {
-        if (body == null){
+        if (body == null)
             return null;
-        }
-        if (body.isObject()) {
+        if (body.isObject())
             return toPojoObject(pojo, body.asObject());
-        } else if (body.isArray()) {
+        if (body.isArray())
             return toPojoArray(pojo, body.asArray());
-        } else if (body.isReference()) {
+        if (body.isReference())
             return toPojoReference(pojo, body);
-        }
         throw new IllegalArgumentException(String.format("Result of type %s cannot be casted to %s", //
                 body.getType().name(), pojo.getClass().getName()));
     }

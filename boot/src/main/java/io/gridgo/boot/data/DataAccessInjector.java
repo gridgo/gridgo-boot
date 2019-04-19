@@ -81,6 +81,12 @@ public class DataAccessInjector implements Injector {
                     clazz.getName(), field.getName(), field.getType().getName()));
         }
         var targetGateway = annotation.gateway();
+        if(annotation.gatewayClass() != DataAccess.DEFAULT.class){
+            targetGateway = annotation.gatewayClass().getName();
+        }
+        if(targetGateway.isEmpty()){
+            throw new InitializationException("The target gateway name must be specified");
+        }
         var schema = annotation.schema();
         if (!handlerMap.containsKey(schema)) {
             throw new SchemaNoHandlerException("No handler found for schema " + schema);

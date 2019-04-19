@@ -9,7 +9,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DataAccess {
 
-    public String gateway();
+    String gateway() default "";
 
-    public String schema();
+    Class gatewayClass() default DEFAULT.class;
+
+    String schema();
+
+    final class DEFAULT {}
 }

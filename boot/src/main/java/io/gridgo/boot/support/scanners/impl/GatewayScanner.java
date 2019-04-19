@@ -30,7 +30,9 @@ public class GatewayScanner implements AnnotationScanner {
 
     private void registerGateway(GridgoContext context, Class<?> gatewayClass, List<LazyInitializer> lazyInitializers) {
         var annotation = gatewayClass.getAnnotation(io.gridgo.boot.support.annotations.Gateway.class);
-        var gateway = context.openGateway(annotation.value()) //
+        var name = annotation.value().isEmpty() ? gatewayClass.getName() : annotation.value();
+
+        var gateway = context.openGateway(name) //
                              .setAutoStart(annotation.autoStart());
         attachConnectors(context.getRegistry(), gatewayClass, gateway);
         try {

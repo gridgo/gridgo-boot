@@ -3,14 +3,13 @@ package io.gridgo.boot.data.support.impl;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-import io.gridgo.bean.BElement;
-import io.gridgo.bean.BObject;
-import io.gridgo.boot.data.support.annotations.SingleMapper;
 import org.joo.promise4j.Promise;
 
+import io.gridgo.bean.BElement;
 import io.gridgo.boot.data.DataAccessHandler;
 import io.gridgo.boot.data.PojoConverter;
 import io.gridgo.boot.data.support.annotations.PojoMapper;
+import io.gridgo.boot.data.support.annotations.SingleMapper;
 import io.gridgo.connector.support.MessageProducer;
 import io.gridgo.core.GridgoContext;
 import io.gridgo.framework.support.Message;

@@ -11,7 +11,5 @@ public @interface GatewayInject {
 
     String value() default "";
 
-    Class<?> clazz() default DEFAULT.class;
-
-    final class DEFAULT {}
+    Class<?> clazz() default void.class;
 }

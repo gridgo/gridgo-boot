@@ -11,14 +11,13 @@ import io.gridgo.boot.support.LazyInitializer;
 import io.gridgo.boot.support.annotations.AnnotationUtils;
 import io.gridgo.boot.support.annotations.Connector;
 import io.gridgo.boot.support.annotations.Gateway;
-import io.gridgo.boot.support.exceptions.InitializationException;
 import io.gridgo.core.GridgoContext;
 import io.gridgo.core.Processor;
 import io.gridgo.core.support.subscription.GatewaySubscription;
 import io.gridgo.framework.execution.ExecutionStrategy;
 import io.gridgo.framework.support.Registry;
 
-public class GatewayScanner implements AnnotationScanner {
+public class GatewayScanner implements AnnotationScanner, ClassResolver {
 
     @Override
     public void scanAnnotation(Reflections ref, GridgoContext context, List<LazyInitializer> lazyInitializers) {
@@ -35,14 +34,9 @@ public class GatewayScanner implements AnnotationScanner {
         var gateway = context.openGateway(name) //
                              .setAutoStart(annotation.autoStart());
         attachConnectors(context.getRegistry(), gatewayClass, gateway);
-        try {
-            var instance = gatewayClass.getConstructor().newInstance();
-            subscribeProcessor(context.getRegistry(), gatewayClass, gateway, instance);
-            lazyInitializers.add(new LazyInitializer(gatewayClass, instance));
-        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-                | NoSuchMethodException | SecurityException e) {
-            throw new InitializationException("Cannot register processor", e);
-        }
+        var instance = resolveClass(gatewayClass, context);
+        subscribeProcessor(context.getRegistry(), gatewayClass, gateway, instance);
+        lazyInitializers.add(new LazyInitializer(gatewayClass, instance));
     }
 
     private void subscribeProcessor(Registry registry, Class<?> gatewayClass, GatewaySubscription gateway,

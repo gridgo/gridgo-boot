@@ -12,4 +12,6 @@ import java.lang.annotation.Target;
 public @interface Connector {
 
     String value();
+
+    String builder() default "";
 }

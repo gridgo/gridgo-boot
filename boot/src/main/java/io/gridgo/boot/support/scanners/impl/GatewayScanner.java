@@ -11,6 +11,7 @@ import io.gridgo.boot.support.LazyInitializer;
 import io.gridgo.boot.support.annotations.AnnotationUtils;
 import io.gridgo.boot.support.annotations.Connector;
 import io.gridgo.boot.support.annotations.Gateway;
+import io.gridgo.connector.support.config.ConnectorContextBuilder;
 import io.gridgo.core.GridgoContext;
 import io.gridgo.core.Processor;
 import io.gridgo.core.support.subscription.GatewaySubscription;
@@ -52,7 +53,13 @@ public class GatewayScanner implements AnnotationScanner, ClassResolver {
     private void attachConnectors(Registry registry, Class<?> gatewayClass, GatewaySubscription gateway) {
         var connectors = gatewayClass.getAnnotationsByType(Connector.class);
         for (var connector : connectors) {
-            gateway.attachConnector(registry.substituteRegistriesRecursive(connector.value()));
+            var endpoint = registry.substituteRegistriesRecursive(connector.value());
+            if (connector.builder().isBlank()) {
+                gateway.attachConnector(endpoint);
+            } else {
+                var builder = registry.lookupMandatory(connector.builder(), ConnectorContextBuilder.class);
+                gateway.attachConnector(endpoint, builder.build());
+            }
         }
     }
 

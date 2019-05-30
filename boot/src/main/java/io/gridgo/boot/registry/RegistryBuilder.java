@@ -29,7 +29,7 @@ public class RegistryBuilder implements Builder<Registry> {
     }
 
     @Override
-    public Registry build() {
+    public MultiSourceRegistry build() {
         var registries = new ArrayList<Registry>();
 
         if (this.registries != null)

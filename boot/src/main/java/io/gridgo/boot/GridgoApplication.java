@@ -54,10 +54,10 @@ public class GridgoApplication extends AbstractComponentLifecycle {
         this.registry = new AnnotatedRegistry(applicationClass);
         initializeRegistry();
         initializeContext();
-        initializeContextWithAnnotation();
         this.appName = this.context.getName();
         this.injector = new FieldInjector(context);
         initializeComponents();
+        initializeContextWithAnnotation();
     }
 
     protected void initializeContext() {

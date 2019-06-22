@@ -91,7 +91,7 @@ public class DataAccessInjector implements Injector {
 
         var schema = detectSchema(targetGateway);
         if (!handlerMap.containsKey(schema)) {
-            throw new SchemaNoHandlerException("No handler found for schema " + schema);
+            throw new SchemaNoHandlerException("No handler found for schema [" + schema + "]");
         }
         var proxy = initDataAccessProxy(targetGateway, type, handlerMap.get(schema));
         ObjectUtils.setValue(instance, field.getName(), proxy);

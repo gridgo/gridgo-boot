@@ -10,7 +10,7 @@ import io.gridgo.boot.data.support.annotations.DataAccess;
 import io.gridgo.boot.data.support.annotations.PojoMapper;
 import io.gridgo.framework.support.Message;
 
-@DataAccess(gateway = "mysql", schema = "jdbc")
+@DataAccess(gateway = "mysql")
 public interface UserDAO {
 
     @JdbcProduce("drop table if exists test_users")

@@ -19,6 +19,11 @@
 		</dependency>
 		<dependency>
 			<groupId>io.gridgo</groupId>
+			<artifactId>gridgo-keyvalue-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.gridgo</groupId>
 			<artifactId>gridgo-extras-typesafe</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -44,6 +49,12 @@
 		</dependency>
 
 		<!-- testing -->
+		<dependency>
+			<groupId>io.gridgo</groupId>
+			<artifactId>gridgo-rocksdb</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>io.gridgo</groupId>
 			<artifactId>gridgo-jdbc</artifactId>

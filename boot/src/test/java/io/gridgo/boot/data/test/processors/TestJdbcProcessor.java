@@ -10,8 +10,8 @@ import io.gridgo.core.support.RoutingContext;
 import lombok.Setter;
 
 @Setter
-@Gateway("test")
-public class TestProcessor extends AbstractProcessor {
+@Gateway("test_jdbc")
+public class TestJdbcProcessor extends AbstractProcessor {
 
     @ComponentInject
     private UserDomainService userService;
@@ -21,7 +21,7 @@ public class TestProcessor extends AbstractProcessor {
 
     @Override
     public void process(RoutingContext rc, GridgoContext gc) {
-        userService.createAndSaveUser() //
+        userService.createAndSaveUserJdbc() //
                    .map(transformer::transform) //
                    .forward(rc.getDeferred());
     }

@@ -17,6 +17,7 @@ import io.gridgo.boot.data.support.annotations.DataAccessSchema;
 import io.gridgo.boot.support.Injector;
 import io.gridgo.boot.support.annotations.AnnotationUtils;
 import io.gridgo.boot.support.exceptions.InitializationException;
+import io.gridgo.boot.support.exceptions.InjectException;
 import io.gridgo.core.GridgoContext;
 import io.gridgo.utils.ObjectUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -81,18 +82,29 @@ public class DataAccessInjector implements Injector {
                     clazz.getName(), field.getName(), field.getType().getName()));
         }
         var targetGateway = annotation.gateway();
-        if(annotation.gatewayClass() != DataAccess.DEFAULT.class){
+        if (targetGateway.isEmpty() && annotation.gatewayClass() != void.class) {
             targetGateway = annotation.gatewayClass().getName();
         }
-        if(targetGateway.isEmpty()){
+        if (targetGateway.isEmpty()) {
             throw new InitializationException("The target gateway name must be specified");
         }
-        var schema = annotation.schema();
+
+        var schema = detectSchema(targetGateway);
         if (!handlerMap.containsKey(schema)) {
-            throw new SchemaNoHandlerException("No handler found for schema " + schema);
+            throw new SchemaNoHandlerException("No handler found for schema [" + schema + "]");
         }
         var proxy = initDataAccessProxy(targetGateway, type, handlerMap.get(schema));
         ObjectUtils.setValue(instance, field.getName(), proxy);
+    }
+
+    private String detectSchema(String targetGateway) {
+        var gateway = context.findGatewayMandatory(targetGateway);
+        var connectors = gateway.getConnectors();
+        if (connectors.size() != 1) {
+            throw new InjectException(
+                    String.format("Target gateway %s must have exactly 1 attached connector", targetGateway));
+        }
+        return connectors.get(0).getConnectorConfig().getConnectorCategory();
     }
 
     private Object initDataAccessProxy(String targetGateway, Class<?> proxyClass,

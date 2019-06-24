@@ -11,9 +11,7 @@ public @interface DataAccess {
 
     String gateway() default "";
 
-    Class<?> gatewayClass() default DEFAULT.class;
-
-    String schema();
-
-    final class DEFAULT {}
+    Class<?> gatewayClass() default void.class;
+    
+    String schema() default "";
 }

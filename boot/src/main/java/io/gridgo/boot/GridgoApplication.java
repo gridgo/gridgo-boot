@@ -12,6 +12,7 @@ import io.gridgo.boot.support.AnnotationScanner;
 import io.gridgo.boot.support.FieldInjector;
 import io.gridgo.boot.support.LazyInitializer;
 import io.gridgo.boot.support.annotations.AnnotationUtils;
+import io.gridgo.boot.support.annotations.ContextInitializer;
 import io.gridgo.boot.support.annotations.EnableComponentScan;
 import io.gridgo.boot.support.annotations.RegistryInitializer;
 import io.gridgo.boot.support.exceptions.InitializationException;
@@ -56,6 +57,7 @@ public class GridgoApplication extends AbstractComponentLifecycle {
         this.appName = this.context.getName();
         this.injector = new FieldInjector(context);
         initializeComponents();
+        initializeContextWithAnnotation();
     }
 
     protected void initializeContext() {
@@ -119,6 +121,21 @@ public class GridgoApplication extends AbstractComponentLifecycle {
                     method.invoke(null);
                 else
                     method.invoke(null, registry);
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                throw new InitializationException("Cannot initialize application", e);
+            }
+        }
+    }
+
+    private void initializeContextWithAnnotation() {
+        var methods = AnnotationUtils.findAllMethodsWithAnnotation(applicationClass, ContextInitializer.class);
+        for (var method : methods) {
+            try {
+                var params = method.getParameterCount();
+                if (params == 0)
+                    method.invoke(null);
+                else
+                    method.invoke(null, context);
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 throw new InitializationException("Cannot initialize application", e);
             }

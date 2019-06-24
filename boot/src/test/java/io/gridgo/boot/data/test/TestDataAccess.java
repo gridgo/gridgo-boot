@@ -17,14 +17,22 @@ import io.gridgo.framework.support.Registry;
 public class TestDataAccess {
 
     @Test
-    public void testDataAccess() throws InterruptedException {
-        var app = GridgoApplication.run(TestDataAccess.class);
+    public void testRocksDB() throws InterruptedException {
+        doTest("test_rocksdb");
+    }
 
+    @Test
+    public void testJdbc() throws InterruptedException {
+        doTest("test_jdbc");
+    }
+
+    protected void doTest(String gateway) throws InterruptedException {
+        var app = GridgoApplication.run(TestDataAccess.class);
         var latch = new CountDownLatch(1);
         var exRef = new AtomicReference<Exception>(null);
 
         app.getContext() //
-           .findGatewayMandatory("test") //
+           .findGatewayMandatory(gateway) //
            .push(Message.ofAny(null)) //
            .always((s, r, e) -> {
                try {

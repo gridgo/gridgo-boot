@@ -1,5 +1,7 @@
 package io.gridgo.boot.data.test.data;
 
+import io.gridgo.boot.support.annotations.PostConstruct;
+import lombok.Getter;
 import org.joo.promise4j.Promise;
 
 import io.gridgo.bean.BObject;
@@ -18,13 +20,22 @@ public class UserDomainService {
     @DataAccessInject
     private UserKVDAO userKVDAO;
 
+    @Getter
+    private String postConstructVerifier;
+
+    private Promise<Message, Exception> jdbcInitPromise;
+
+    @PostConstruct
+    public void init() {
+        jdbcInitPromise = userDAO.dropTable() //
+                .then(r -> userDAO.createTable());
+    }
+
     public Promise<Message, Exception> createAndSaveUserJdbc() {
-        return userDAO.dropTable() //
-                      .then(r -> userDAO.createTable()) //
-                      .then(r -> userDAO.add(1, "hello")) //
-                      .then(r -> userDAO.findSingle(2)) //
-                      .then(r -> userDAO.findSingle(1)) //
-                      .map(Message::ofAny);
+        return jdbcInitPromise.then(r -> userDAO.add(1, "hello")) //
+                .then(r -> userDAO.findSingle(2)) //
+                .then(r -> userDAO.findSingle(1)) //
+                .map(Message::ofAny);
     }
 
     public Promise<Message, Exception> createAndSaveUserRocksDB() {

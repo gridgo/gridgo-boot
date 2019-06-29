@@ -1,13 +1,11 @@
-package io.gridgo.boot.support.annotations;
+package io.gridgo.boot.data.support.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ ElementType.FIELD, ElementType.PARAMETER })
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RegistryInject {
-
-    String value();
+public @interface SingleMapper {
 }

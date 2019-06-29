@@ -5,9 +5,11 @@ import java.lang.reflect.Method;
 
 import org.joo.promise4j.Promise;
 
+import io.gridgo.bean.BElement;
 import io.gridgo.boot.data.DataAccessHandler;
 import io.gridgo.boot.data.PojoConverter;
 import io.gridgo.boot.data.support.annotations.PojoMapper;
+import io.gridgo.boot.data.support.annotations.SingleMapper;
 import io.gridgo.connector.support.MessageProducer;
 import io.gridgo.core.GridgoContext;
 import io.gridgo.framework.support.Message;
@@ -33,16 +35,32 @@ public abstract class AbstractDataAccessHandler<T extends Annotation> implements
             return Promise.ofCause(new IllegalArgumentException(String.format("Method %s is not annotated with @%s",
                     proxy.getClass().getName(), method.getName(), annotatedClass.getSimpleName())));
         }
-        var msg = buildMessage(annotation, method, args);
-        return filter(method, gateway.call(msg));
+        var msgRequest = buildMessage(annotation, method, args);
+        var msgResult = gateway.call(msgRequest);
+        return msgResult.filterDone(r -> filterSingleMapper(method, r))
+                .filterDone(r -> filterPojoMapper(method, r));
     }
 
-    protected Promise<?, Exception> filter(Method method, Promise<Message, Exception> promise) {
+    protected Object filterSingleMapper(Method method, Message result) {
+        var annotation = method.getAnnotation(SingleMapper.class);
+        if (annotation == null)
+            return result;
+        if(result.body().isArray()){
+            var array = result.body().asArray();
+            return array.isEmpty() ? null : array.get(0);
+        }else {
+            return result.body();
+        }
+    }
+
+    protected Object filterPojoMapper(Method method, Object result) {
         var annotation = method.getAnnotation(PojoMapper.class);
         if (annotation == null)
-            return promise;
+            return result;
         var pojo = annotation.value();
-        return promise.filterDone(r -> toPojo(r, pojo));
+        if (result instanceof Message)
+            return toPojo(((Message) result).body(), pojo);
+        return toPojo((BElement) result, pojo);
     }
 
     protected abstract Message buildMessage(T annotation, Method method, Object[] args);

@@ -7,8 +7,12 @@
 	<parent>
 		<groupId>io.gridgo</groupId>
 		<artifactId>gridgo-base</artifactId>
-		<version>0.5.0</version>
+		<version>0.6.1</version>
 	</parent>
+
+	<properties>
+		<gridgo.version>0.6.1</gridgo.version>
+	</properties>
 
 	<modules>
 		<module>boot</module>
@@ -39,12 +43,6 @@
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-slf4j-impl</artifactId>
 			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

@@ -6,7 +6,9 @@ import io.gridgo.bean.BObject;
 import io.gridgo.boot.data.support.annotations.DataAccessSchema;
 import io.gridgo.boot.data.support.impl.AbstractDataAccessHandler;
 import io.gridgo.framework.support.Message;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @DataAccessSchema("jdbc")
 public class JdbcDataAccessHandler extends AbstractDataAccessHandler<JdbcProduce> {
 
@@ -30,6 +32,7 @@ public class JdbcDataAccessHandler extends AbstractDataAccessHandler<JdbcProduce
             }
         }
         var query = context.getRegistry().substituteRegistriesRecursive(annotation.value());
+        log.debug("Query: {}, params: {}", query, headers);
         return Message.ofAny(headers, query);
     }
 }

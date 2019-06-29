@@ -12,10 +12,12 @@ import io.gridgo.boot.support.AnnotationScanner;
 import io.gridgo.boot.support.FieldInjector;
 import io.gridgo.boot.support.LazyInitializer;
 import io.gridgo.boot.support.annotations.AnnotationUtils;
+import io.gridgo.boot.support.annotations.ContextInitializer;
 import io.gridgo.boot.support.annotations.EnableComponentScan;
 import io.gridgo.boot.support.annotations.RegistryInitializer;
 import io.gridgo.boot.support.exceptions.InitializationException;
 import io.gridgo.boot.support.exceptions.ResourceNotFoundException;
+import io.gridgo.boot.support.scanners.impl.ComponentScanner;
 import io.gridgo.boot.support.scanners.impl.GatewayScanner;
 import io.gridgo.core.GridgoContext;
 import io.gridgo.core.impl.ConfiguratorContextBuilder;
@@ -40,17 +42,25 @@ public class GridgoApplication extends AbstractComponentLifecycle {
 
     private String[] args;
 
-    private List<LazyInitializer> lazyInitializers;
+    private List<LazyInitializer> lazyInitializers = new ArrayList<>();
 
     private FieldInjector injector;
 
-    private List<AnnotationScanner> scanners;
+    private List<AnnotationScanner> scanners = new ArrayList<>();
 
     private GridgoApplication(Class<?> applicationClass, String... args) {
         this.applicationClass = applicationClass;
         this.args = args;
         this.registry = new AnnotatedRegistry(applicationClass);
-        this.initializeRegistry();
+        initializeRegistry();
+        initializeContext();
+        this.appName = this.context.getName();
+        this.injector = new FieldInjector(context);
+        initializeComponents();
+        initializeContextWithAnnotation();
+    }
+
+    protected void initializeContext() {
         try {
             var configurator = new ResourceConfigurator();
             this.context = new ConfiguratorContextBuilder().setRegistry(registry) //
@@ -59,18 +69,21 @@ public class GridgoApplication extends AbstractComponentLifecycle {
         } catch (ResourceNotFoundException ex) {
             this.context = new DefaultGridgoContextBuilder().setRegistry(registry).build();
         }
-        this.appName = this.context.getName();
-        this.injector = new FieldInjector(context);
-        this.lazyInitializers = new ArrayList<>();
-        this.scanners = new ArrayList<>();
-        this.initialize();
     }
 
-    private void initialize() {
+    protected void initializeComponents() {
+        scanForComponents();
+        injectLazyInitializers();
+    }
+
+    protected void scanForComponents() {
         var enableComponentScan = applicationClass.getAnnotation(EnableComponentScan.class);
         if (enableComponentScan != null) {
             scanComponents();
         }
+    }
+
+    protected void injectLazyInitializers() {
         for (var initializer : lazyInitializers) {
             injector.injectFields(initializer.getGatewayClass(), initializer.getInstance());
         }
@@ -80,6 +93,7 @@ public class GridgoApplication extends AbstractComponentLifecycle {
         var pkg = applicationClass.getPackageName();
         var ref = new Reflections(pkg);
         this.scanners.add(new GatewayScanner());
+        this.scanners.add(new ComponentScanner());
         for (var scanner : scanners) {
             scanner.scanAnnotation(ref, context, lazyInitializers);
         }
@@ -107,6 +121,21 @@ public class GridgoApplication extends AbstractComponentLifecycle {
                     method.invoke(null);
                 else
                     method.invoke(null, registry);
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                throw new InitializationException("Cannot initialize application", e);
+            }
+        }
+    }
+
+    private void initializeContextWithAnnotation() {
+        var methods = AnnotationUtils.findAllMethodsWithAnnotation(applicationClass, ContextInitializer.class);
+        for (var method : methods) {
+            try {
+                var params = method.getParameterCount();
+                if (params == 0)
+                    method.invoke(null);
+                else
+                    method.invoke(null, context);
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 throw new InitializationException("Cannot initialize application", e);
             }

@@ -1,24 +1,23 @@
 package io.gridgo.boot.support.scanners.impl;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
 import java.util.List;
 
 import org.reflections.Reflections;
 
 import io.gridgo.boot.support.AnnotationScanner;
 import io.gridgo.boot.support.LazyInitializer;
-import io.gridgo.boot.support.annotations.AnnotationUtils;
 import io.gridgo.boot.support.annotations.Connector;
 import io.gridgo.boot.support.annotations.Gateway;
-import io.gridgo.boot.support.exceptions.InitializationException;
+import io.gridgo.boot.support.annotations.Instrumenter;
+import io.gridgo.connector.support.config.ConnectorContextBuilder;
 import io.gridgo.core.GridgoContext;
 import io.gridgo.core.Processor;
 import io.gridgo.core.support.subscription.GatewaySubscription;
 import io.gridgo.framework.execution.ExecutionStrategy;
+import io.gridgo.framework.execution.ExecutionStrategyInstrumenter;
 import io.gridgo.framework.support.Registry;
 
-public class GatewayScanner implements AnnotationScanner {
+public class GatewayScanner implements AnnotationScanner, ClassResolver {
 
     @Override
     public void scanAnnotation(Reflections ref, GridgoContext context, List<LazyInitializer> lazyInitializers) {
@@ -30,52 +29,37 @@ public class GatewayScanner implements AnnotationScanner {
 
     private void registerGateway(GridgoContext context, Class<?> gatewayClass, List<LazyInitializer> lazyInitializers) {
         var annotation = gatewayClass.getAnnotation(io.gridgo.boot.support.annotations.Gateway.class);
-        var gateway = context.openGateway(annotation.value()) //
+        var name = annotation.value().isEmpty() ? gatewayClass.getName() : annotation.value();
+
+        var gateway = context.openGateway(name) //
                              .setAutoStart(annotation.autoStart());
         attachConnectors(context.getRegistry(), gatewayClass, gateway);
-        try {
-            var instance = gatewayClass.getConstructor().newInstance();
-            subscribeProcessor(context.getRegistry(), gatewayClass, gateway, instance);
-            lazyInitializers.add(new LazyInitializer(gatewayClass, instance));
-        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-                | NoSuchMethodException | SecurityException e) {
-            throw new InitializationException("Cannot register processor", e);
-        }
+        var instance = resolveClass(gatewayClass, context);
+        subscribeProcessor(context.getRegistry(), gatewayClass, gateway, instance);
+        lazyInitializers.add(new LazyInitializer(gatewayClass, instance));
     }
 
     private void subscribeProcessor(Registry registry, Class<?> gatewayClass, GatewaySubscription gateway,
             Object instance) {
         var executionStrategy = extractExecutionStrategy(registry, gatewayClass);
+        var instrumenter = extractInstrumenter(registry, gatewayClass);
         if (instance instanceof Processor) {
-            gateway.subscribe((Processor) instance).using(executionStrategy);
-        } else {
-            subscribeProcessorMethods(gatewayClass, gateway, instance, executionStrategy);
+            gateway.subscribe((Processor) instance) //
+                   .using(executionStrategy) //
+                   .instrumentWith(instrumenter);
         }
     }
 
     private void attachConnectors(Registry registry, Class<?> gatewayClass, GatewaySubscription gateway) {
         var connectors = gatewayClass.getAnnotationsByType(Connector.class);
         for (var connector : connectors) {
-            gateway.attachConnector(registry.substituteRegistriesRecursive(connector.value()));
-        }
-    }
-
-    private void subscribeProcessorMethods(Class<?> gatewayClass, GatewaySubscription gateway, Object instance,
-            ExecutionStrategy executionStrategy) {
-        var methods = AnnotationUtils.findAllMethodsWithAnnotation(gatewayClass,
-                io.gridgo.boot.support.annotations.Processor.class);
-        for (var method : methods) {
-            var staticMethod = Modifier.isStatic(method.getModifiers());
-            gateway.subscribe((rc, gc) -> {
-                try {
-                    if (staticMethod)
-                        method.invoke(null, rc, gc);
-                    else
-                        method.invoke(instance, rc, gc);
-                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                    rc.getDeferred().reject(e);
-                }
-            }).using(executionStrategy);
+            var endpoint = registry.substituteRegistriesRecursive(connector.value());
+            if (connector.builder().isBlank()) {
+                gateway.attachConnector(endpoint);
+            } else {
+                var builder = registry.lookupMandatory(connector.builder(), ConnectorContextBuilder.class);
+                gateway.attachConnector(endpoint, builder.build());
+            }
         }
     }
 
@@ -84,5 +68,12 @@ public class GatewayScanner implements AnnotationScanner {
         if (executionStrategy == null)
             return null;
         return registry.lookupMandatory(executionStrategy.value(), ExecutionStrategy.class);
+    }
+
+    private ExecutionStrategyInstrumenter extractInstrumenter(Registry registry, Class<?> gatewayClass) {
+        var instrumenter = gatewayClass.getAnnotation(Instrumenter.class);
+        if (instrumenter == null)
+            return null;
+        return registry.lookupMandatory(instrumenter.value(), ExecutionStrategyInstrumenter.class);
     }
 }

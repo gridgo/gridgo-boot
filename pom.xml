@@ -2,7 +2,6 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>gridgo-boot-base</artifactId>
 	<packaging>pom</packaging>
-	<version>0.5.1-SNAPSHOT</version>
 
 	<parent>
 		<groupId>io.gridgo</groupId>
@@ -17,11 +16,6 @@
 	<modules>
 		<module>boot</module>
 	</modules>
-
-	<properties>
-		<gridgo.version>0.5.0</gridgo.version>
-		<junit.version>4.12</junit.version>
-	</properties>
 
 	<dependencies>
 		<dependency>

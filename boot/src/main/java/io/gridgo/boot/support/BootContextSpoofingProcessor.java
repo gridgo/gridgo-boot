@@ -35,8 +35,7 @@ public class BootContextSpoofingProcessor extends ContextSpoofingProcessor {
     private BObject mapInjection(Processor processor, Field f) {
         var type = f.getType().getName();
         var result = BObject.of("fieldName", f.getName()) //
-                            .setAny("fieldType", type) //
-                            .setAny("fieldValue", extractFieldValue(processor, f));
+                            .setAny("fieldType", type);
         var gatewayInject = f.getAnnotation(GatewayInject.class);
         if (gatewayInject != null) {
             return result.setAny("type", "gateway") //
@@ -59,13 +58,5 @@ public class BootContextSpoofingProcessor extends ContextSpoofingProcessor {
                          .setAny("target", type);
         }
         return null;
-    }
-
-    protected Object extractFieldValue(Processor processor, Field f) {
-        try {
-            return f.get(processor);
-        } catch (IllegalArgumentException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

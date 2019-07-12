@@ -19,21 +19,24 @@ public class BootContextSpoofingProcessor extends ContextSpoofingProcessor {
     @Override
     protected BObject spoofProcessor(Processor processor) {
         var result = super.spoofProcessor(processor);
-        var injections = spoofInjection(processor.getClass());
+        var injections = spoofInjection(processor);
         if (injections.isEmpty())
             return result;
         return result.setAny("injections", injections);
     }
 
-    private List<?> spoofInjection(Class<? extends Processor> clazz) {
-        return Arrays.stream(clazz.getDeclaredFields()) //
-                     .map(this::mapInjection) //
+    private List<?> spoofInjection(Processor processor) {
+        return Arrays.stream(processor.getClass().getDeclaredFields()) //
+                     .map(f -> mapInjection(processor, f)) //
                      .filter(Objects::nonNull) //
                      .collect(Collectors.toList());
     }
 
-    private BObject mapInjection(Field f) {
-        var result = BObject.of("name", f.getName());
+    private BObject mapInjection(Processor processor, Field f) {
+        var type = f.getType().getName();
+        var result = BObject.of("fieldName", f.getName()) //
+                            .setAny("fieldType", type) //
+                            .setAny("fieldValue", extractFieldValue(processor, f));
         var gatewayInject = f.getAnnotation(GatewayInject.class);
         if (gatewayInject != null) {
             return result.setAny("type", "gateway") //
@@ -48,13 +51,21 @@ public class BootContextSpoofingProcessor extends ContextSpoofingProcessor {
         var componentInject = f.getAnnotation(ComponentInject.class);
         if (componentInject != null) {
             return result.setAny("type", "component") //
-                         .setAny("target", f.getType().getName());
+                         .setAny("target", type);
         }
         var dataAccessInject = f.getAnnotation(DataAccessInject.class);
         if (dataAccessInject != null) {
             return result.setAny("type", "dataAccess") //
-                         .setAny("target", f.getType().getName());
+                         .setAny("target", type);
         }
         return null;
+    }
+
+    protected Object extractFieldValue(Processor processor, Field f) {
+        try {
+            return f.get(processor);
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

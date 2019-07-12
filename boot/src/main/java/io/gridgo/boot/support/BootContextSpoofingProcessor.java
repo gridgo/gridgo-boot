@@ -25,14 +25,14 @@ public class BootContextSpoofingProcessor extends ContextSpoofingProcessor {
         return result.setAny("injections", injections);
     }
 
-    private List<?> spoofInjection(Processor processor) {
+    private List<?> spoofInjection(Object processor) {
         return Arrays.stream(processor.getClass().getDeclaredFields()) //
                      .map(f -> mapInjection(processor, f)) //
                      .filter(Objects::nonNull) //
                      .collect(Collectors.toList());
     }
 
-    private BObject mapInjection(Processor processor, Field f) {
+    private BObject mapInjection(Object processor, Field f) {
         var type = f.getType().getName();
         var result = BObject.of("fieldName", f.getName()) //
                             .setAny("fieldType", type);

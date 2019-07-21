@@ -3,11 +3,13 @@ package io.gridgo.boot.data.test;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.joo.promise4j.PromiseException;
 import org.junit.Assert;
 import org.junit.Test;
 
 import io.gridgo.boot.GridgoApplication;
 import io.gridgo.boot.data.test.data.User;
+import io.gridgo.boot.data.test.data.UserDomainService;
 import io.gridgo.boot.support.annotations.EnableComponentScan;
 import io.gridgo.boot.support.annotations.RegistryInitializer;
 import io.gridgo.framework.support.Message;
@@ -24,6 +26,15 @@ public class TestDataAccess {
     @Test
     public void testJdbc() throws InterruptedException {
         doTest("test_jdbc");
+    }
+
+    @Test
+    public void testDataSource() throws PromiseException, InterruptedException {
+        var app = GridgoApplication.run(TestDataAccess.class);
+        var service = app.getRegistry().lookup(UserDomainService.class.getName(), UserDomainService.class);
+        var msg = service.createAndSaveWithDataSource().get();
+        Assert.assertEquals("test", msg.body().asValue().getString());
+        app.stop();
     }
 
     protected void doTest(String gateway) throws InterruptedException {

@@ -6,6 +6,9 @@ import io.gridgo.boot.support.annotations.Gateway;
 import io.gridgo.boot.support.annotations.GatewayInject;
 import io.gridgo.boot.support.exceptions.InitializationException;
 import io.gridgo.boot.support.exceptions.InjectException;
+import io.gridgo.boot.support.exceptions.NoDataSourceException;
+import io.gridgo.connector.DataSourceProvider;
+import io.gridgo.connector.support.MessageProducer;
 import io.gridgo.core.GridgoContext;
 import io.gridgo.utils.ObjectUtils;
 
@@ -33,8 +36,28 @@ public class GatewayInjector implements Injector {
                                 gatewayClass.getName(), field.getName()));
             }
             var gateway = context.findGatewayMandatory(injectedKey);
-            ObjectUtils.setValue(instance, name, gateway);
+            var value = extractValue(field.getType(), gateway);
+            ObjectUtils.setValue(instance, name, value);
         }
+    }
+
+    protected Object extractValue(Class<?> type, io.gridgo.core.Gateway gateway) {
+        if (MessageProducer.class.isAssignableFrom(type))
+            return gateway;
+        if (DataSourceProvider.class.isAssignableFrom(type))
+            return extractDataSource(gateway);
+        throw new IllegalArgumentException(
+                "Fields with @GatewayInject must have type of MessageProducer, Gateway or DataSourceProvider."
+                        + type.getName() + " found.");
+    }
+
+    private DataSourceProvider<?> extractDataSource(io.gridgo.core.Gateway gateway) {
+        return gateway.getConnectors() //
+                      .stream() //
+                      .filter(c -> c instanceof DataSourceProvider<?>) //
+                      .map(c -> (DataSourceProvider<?>) c) //
+                      .findAny() //
+                      .orElseThrow(() -> new NoDataSourceException("No datasource found for gateway: " + gateway));
     }
 
     private String resolveWithClass(Class<?> clazz) {

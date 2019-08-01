@@ -79,10 +79,11 @@ public class GatewayScanner implements AnnotationScanner, ClassResolver {
         return registry.lookupMandatory(instrumenter.value(), ExecutionStrategyInstrumenter.class);
     }
 
-    private ExecutionStrategyInstrumenter extractProducerInstrumenter(Registry registry, Class<?> gatewayClass) {
+    private io.gridgo.framework.execution.ProducerInstrumenter extractProducerInstrumenter(Registry registry,
+            Class<?> gatewayClass) {
         var instrumenter = gatewayClass.getAnnotation(ProducerInstrumenter.class);
         if (instrumenter == null)
             return null;
-        return registry.lookupMandatory(instrumenter.value(), ExecutionStrategyInstrumenter.class);
+        return registry.lookupMandatory(instrumenter.value(), io.gridgo.framework.execution.ProducerInstrumenter.class);
     }
 }

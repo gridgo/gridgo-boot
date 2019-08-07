@@ -19,11 +19,13 @@
 			<groupId>io.gridgo</groupId>
 			<artifactId>gridgo-extras-typesafe</artifactId>
 			<version>${gridgo.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.gridgo</groupId>
 			<artifactId>gridgo-extras-yaml</artifactId>
 			<version>${gridgo.version}</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- testing -->

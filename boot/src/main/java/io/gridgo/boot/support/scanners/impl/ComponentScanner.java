@@ -9,6 +9,7 @@ import io.gridgo.boot.support.LazyInitializer;
 import io.gridgo.boot.support.annotations.Component;
 import io.gridgo.boot.support.exceptions.InitializationException;
 import io.gridgo.core.GridgoContext;
+import io.gridgo.core.support.ContextAwareComponent;
 
 public class ComponentScanner implements AnnotationScanner, ClassResolver {
 
@@ -29,6 +30,9 @@ public class ComponentScanner implements AnnotationScanner, ClassResolver {
                 context.getRegistry().register(name, instance);
             } else {
                 context.getRegistry().register(comp.getName(), instance);
+            }
+            if (instance instanceof ContextAwareComponent) {
+                context.attachComponent((ContextAwareComponent) instance);
             }
             lazyInitializers.add(new LazyInitializer(comp, instance));
         } catch (IllegalArgumentException | SecurityException e) {

@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>io.gridgo</groupId>
 		<artifactId>gridgo-boot-base</artifactId>
-		<version>0.6.1</version>
+		<version>0.7.0</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -19,11 +19,13 @@
 			<groupId>io.gridgo</groupId>
 			<artifactId>gridgo-extras-typesafe</artifactId>
 			<version>${gridgo.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.gridgo</groupId>
 			<artifactId>gridgo-extras-yaml</artifactId>
 			<version>${gridgo.version}</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- testing -->
@@ -42,7 +44,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.13</version>
+			<version>8.0.16</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

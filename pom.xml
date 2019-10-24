@@ -6,11 +6,11 @@
 	<parent>
 		<groupId>io.gridgo</groupId>
 		<artifactId>gridgo-base</artifactId>
-		<version>0.6.1</version>
+		<version>0.7.0</version>
 	</parent>
 
 	<properties>
-		<gridgo.version>0.6.1</gridgo.version>
+		<gridgo.version>0.7.0</gridgo.version>
 	</properties>
 
 	<modules>
@@ -46,4 +46,18 @@
 		<connection>scm:git:[fetch=]https://github.com/gridgo/gridgo-boot.git</connection>
 		<tag>HEAD</tag>
 	</scm>
+
+	<repositories>
+		<repository>
+			<id>sonatypeSnapshots</id>
+			<name>Sonatype Snapshots</name>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</repository>
+	</repositories>
 </project>

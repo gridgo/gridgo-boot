@@ -9,6 +9,7 @@ import io.gridgo.boot.support.LazyInitializer;
 import io.gridgo.boot.support.annotations.Connector;
 import io.gridgo.boot.support.annotations.Gateway;
 import io.gridgo.boot.support.annotations.Instrumenter;
+import io.gridgo.boot.support.annotations.ProducerInstrumenter;
 import io.gridgo.connector.support.config.ConnectorContextBuilder;
 import io.gridgo.core.GridgoContext;
 import io.gridgo.core.Processor;
@@ -35,6 +36,7 @@ public class GatewayScanner implements AnnotationScanner, ClassResolver {
                              .setAutoStart(annotation.autoStart());
         attachConnectors(context.getRegistry(), gatewayClass, gateway);
         var instance = resolveClass(gatewayClass, context);
+        gateway.setProducerInstrumenter(extractProducerInstrumenter(context.getRegistry(), gatewayClass));
         subscribeProcessor(context.getRegistry(), gatewayClass, gateway, instance);
         lazyInitializers.add(new LazyInitializer(gatewayClass, instance));
     }
@@ -75,5 +77,13 @@ public class GatewayScanner implements AnnotationScanner, ClassResolver {
         if (instrumenter == null)
             return null;
         return registry.lookupMandatory(instrumenter.value(), ExecutionStrategyInstrumenter.class);
+    }
+
+    private io.gridgo.framework.execution.ProducerInstrumenter extractProducerInstrumenter(Registry registry,
+            Class<?> gatewayClass) {
+        var instrumenter = gatewayClass.getAnnotation(ProducerInstrumenter.class);
+        if (instrumenter == null)
+            return null;
+        return registry.lookupMandatory(instrumenter.value(), io.gridgo.framework.execution.ProducerInstrumenter.class);
     }
 }

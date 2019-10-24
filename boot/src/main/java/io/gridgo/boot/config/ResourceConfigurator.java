@@ -4,8 +4,6 @@ import io.gridgo.boot.support.exceptions.ResourceNotFoundException;
 import io.gridgo.config.impl.AbstractConfigurator;
 import io.gridgo.config.impl.AbstractLocalConfigurator;
 import io.gridgo.config.impl.JsonConfigurator;
-import io.gridgo.extras.typesafe.TypeSafeConfigurator;
-import io.gridgo.extras.yaml.YamlConfigurator;
 
 public class ResourceConfigurator extends AbstractConfigurator {
 
@@ -27,10 +25,6 @@ public class ResourceConfigurator extends AbstractConfigurator {
             var url = getResource(resource);
             if (url == null)
                 continue;
-            if (resource.endsWith(".conf"))
-                return TypeSafeConfigurator.ofResource(resource);
-            if (resource.endsWith(".yml") || resource.endsWith(".yaml"))
-                return YamlConfigurator.ofResource(resource);
             if (resource.endsWith(".json"))
                 return JsonConfigurator.ofResource(resource);
         }

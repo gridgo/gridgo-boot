@@ -56,6 +56,11 @@ public class UserDomainService {
                               .map(Message::ofAny);
     }
 
+    public Promise<ModifiedUser, Exception> createAndSaveUserWithAliasJdbc() {
+        return jdbcInitPromise.then(r -> userDAO.add(1, "hello")) //
+                              .then(r -> userDAO.findWithAlias(1));
+    }
+
     public Promise<Message, Exception> createAndSaveUserRocksDB() {
         return userKVDAO.add("1", BObject.ofPojo(new User(1, "hello"))) //
                         .then(r -> userKVDAO.find("1")) //

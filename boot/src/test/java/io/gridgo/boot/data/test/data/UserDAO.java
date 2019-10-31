@@ -1,13 +1,13 @@
 package io.gridgo.boot.data.test.data;
 
-import java.util.List;
-
-import io.gridgo.boot.data.support.annotations.SingleMapper;
 import org.joo.promise4j.Promise;
+
+import java.util.List;
 
 import io.gridgo.boot.data.jdbc.JdbcProduce;
 import io.gridgo.boot.data.support.annotations.DataAccess;
 import io.gridgo.boot.data.support.annotations.PojoMapper;
+import io.gridgo.boot.data.support.annotations.SingleMapper;
 import io.gridgo.framework.support.Message;
 
 @DataAccess(gateway = "mysql")
@@ -26,7 +26,6 @@ public interface UserDAO {
     @JdbcProduce(value = "select * from test_users where id = :1")
     public Promise<List<User>, Exception> find(int id);
 
-
     @PojoMapper(User.class)
     @SingleMapper
     @JdbcProduce(value = "select * from test_users where id = :1")
@@ -35,4 +34,9 @@ public interface UserDAO {
     @PojoMapper(User.class)
     @JdbcProduce(value = "select * from test_users where id in (:1)")
     public Promise<List<User>, Exception> findByIds(List<Integer> ids);
+
+    @PojoMapper(ModifiedUser.class)
+    @SingleMapper
+    @JdbcProduce(value = "select id as userId from test_users where id = :1")
+    public Promise<ModifiedUser, Exception> findWithAlias(int id);
 }

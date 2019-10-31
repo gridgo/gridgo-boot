@@ -12,7 +12,7 @@
 	</parent>
 
 	<properties>
-		<gridgo.version>0.7.0-SNAPSHOT</gridgo.version>
+		<gridgo.version>0.8.0-SNAPSHOT</gridgo.version>
 	</properties>
 
 	<modules>

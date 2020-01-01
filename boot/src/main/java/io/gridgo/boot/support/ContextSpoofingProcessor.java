@@ -9,6 +9,7 @@ import io.gridgo.core.GridgoContext;
 import io.gridgo.core.Processor;
 import io.gridgo.core.support.ContextAwareComponent;
 import io.gridgo.core.support.RoutingContext;
+import io.gridgo.core.support.subscription.ConnectorAttachment;
 import io.gridgo.core.support.subscription.GatewaySubscription;
 import io.gridgo.core.support.subscription.ProcessorSubscription;
 import io.gridgo.framework.ComponentLifecycle;
@@ -44,7 +45,8 @@ public class ContextSpoofingProcessor implements Processor {
 
     protected BObject spoofGateway(GatewaySubscription subscription) {
         var connectors = subscription.get() //
-                                     .getConnectors().stream() //
+                                     .getConnectorAttachments().stream() //
+                                     .map(ConnectorAttachment::getConnector) //
                                      .map(this::spoofConnector) //
                                      .collect(Collectors.toList());
         var processors = subscription.getSubscriptions().stream() //

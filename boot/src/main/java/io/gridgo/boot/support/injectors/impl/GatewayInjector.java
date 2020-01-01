@@ -10,6 +10,7 @@ import io.gridgo.boot.support.exceptions.NoDataSourceException;
 import io.gridgo.connector.DataSourceProvider;
 import io.gridgo.connector.support.MessageProducer;
 import io.gridgo.core.GridgoContext;
+import io.gridgo.core.support.subscription.ConnectorAttachment;
 import io.gridgo.utils.ObjectUtils;
 
 public class GatewayInjector implements Injector {
@@ -52,8 +53,9 @@ public class GatewayInjector implements Injector {
     }
 
     private DataSourceProvider<?> extractDataSource(io.gridgo.core.Gateway gateway) {
-        return gateway.getConnectors() //
+        return gateway.getConnectorAttachments() //
                       .stream() //
+                      .map(ConnectorAttachment::getConnector) //
                       .filter(c -> c instanceof DataSourceProvider<?>) //
                       .map(c -> (DataSourceProvider<?>) c) //
                       .findAny() //

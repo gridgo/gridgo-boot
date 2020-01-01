@@ -1,6 +1,6 @@
 package io.gridgo.boot.data;
 
-import static io.gridgo.boot.data.GridgoDataConstants.PACKAGE_REGISTRY;
+import org.reflections.Reflections;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -8,7 +8,7 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.reflections.Reflections;
+import static io.gridgo.boot.data.GridgoDataConstants.PACKAGE_REGISTRY;
 
 import io.gridgo.boot.data.exceptions.SchemaNoHandlerException;
 import io.gridgo.boot.data.support.annotations.DataAccess;
@@ -99,12 +99,12 @@ public class DataAccessInjector implements Injector {
 
     private String detectSchema(String targetGateway) {
         var gateway = context.findGatewayMandatory(targetGateway);
-        var connectors = gateway.getConnectors();
+        var connectors = gateway.getConnectorAttachments();
         if (connectors.size() != 1) {
             throw new InjectException(
                     String.format("Target gateway %s must have exactly 1 attached connector", targetGateway));
         }
-        return connectors.get(0).getConnectorConfig().getConnectorCategory();
+        return connectors.get(0).getConnector().getConnectorConfig().getConnectorCategory();
     }
 
     private Object initDataAccessProxy(String targetGateway, Class<?> proxyClass,

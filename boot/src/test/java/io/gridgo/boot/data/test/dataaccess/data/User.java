@@ -1,4 +1,4 @@
-package io.gridgo.boot.data.test.data;
+package io.gridgo.boot.data.test.dataaccess.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

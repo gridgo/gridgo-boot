@@ -1,7 +1,7 @@
-package io.gridgo.boot.data.test.processors;
+package io.gridgo.boot.data.test.dataaccess.processors;
 
-import io.gridgo.boot.data.test.data.UserDomainService;
-import io.gridgo.boot.data.test.transformers.Transformer;
+import io.gridgo.boot.data.test.dataaccess.data.UserDomainService;
+import io.gridgo.boot.data.test.dataaccess.transformers.Transformer;
 import io.gridgo.boot.support.annotations.ComponentInject;
 import io.gridgo.boot.support.annotations.Gateway;
 import io.gridgo.core.GridgoContext;

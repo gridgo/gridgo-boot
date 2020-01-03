@@ -1,4 +1,4 @@
-package io.gridgo.boot.data.test;
+package io.gridgo.boot.data.test.dataaccess;
 
 import org.joo.promise4j.PromiseException;
 import org.junit.Assert;
@@ -8,8 +8,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.gridgo.boot.GridgoApplication;
-import io.gridgo.boot.data.test.data.User;
-import io.gridgo.boot.data.test.data.UserDomainService;
+import io.gridgo.boot.data.test.dataaccess.data.User;
+import io.gridgo.boot.data.test.dataaccess.data.UserDomainService;
 import io.gridgo.boot.support.annotations.EnableComponentScan;
 import io.gridgo.boot.support.annotations.RegistryInitializer;
 import io.gridgo.framework.support.Message;

@@ -18,8 +18,8 @@ public interface ClassResolver {
                 throw new AmbiguousException("Only one constructor is allowed");
             var constructor = constructors[0];
             var params = Arrays.stream(constructor.getParameters()) //
-                               .map(type -> lookupForType(context, type)) //
-                               .toArray(size -> new Object[size]);
+                    .map(type -> lookupForType(context, type)) //
+                    .toArray(size -> new Object[size]);
             return constructor.newInstance(params);
         } catch (Exception e) {
             throw new RuntimeException("Cannot resolve class " + clazz, e);
@@ -36,9 +36,6 @@ public interface ClassResolver {
         if (annotation != null) {
             return context.getRegistry().lookupMandatory(annotation.value(), param.getType());
         }
-        var answer = context.getRegistry().lookupByType(param.getType());
-        if (answer == null)
-            throw new BeanNotFoundException("Cannot find any bean with the required type " + param.getType());
-        return answer;
+        throw new BeanNotFoundException("Cannot find any bean with the required type " + param.getType());
     }
 }

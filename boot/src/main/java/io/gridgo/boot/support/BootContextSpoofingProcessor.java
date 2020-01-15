@@ -12,7 +12,6 @@ import io.gridgo.boot.support.annotations.ComponentInject;
 import io.gridgo.boot.support.annotations.GatewayInject;
 import io.gridgo.boot.support.annotations.RegistryInject;
 import io.gridgo.core.Processor;
-import io.gridgo.core.support.impl.ContextSpoofingProcessor;
 
 public class BootContextSpoofingProcessor extends ContextSpoofingProcessor {
 

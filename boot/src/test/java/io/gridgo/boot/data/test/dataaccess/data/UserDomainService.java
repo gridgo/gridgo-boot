@@ -1,4 +1,4 @@
-package io.gridgo.boot.data.test.data;
+package io.gridgo.boot.data.test.dataaccess.data;
 
 import org.joo.promise4j.Promise;
 import org.rocksdb.RocksDB;
@@ -54,6 +54,11 @@ public class UserDomainService {
                               .then(r -> userDAO.findSingle(2)) //
                               .then(r -> userDAO.findSingle(1)) //
                               .map(Message::ofAny);
+    }
+
+    public Promise<ModifiedUser, Exception> createAndSaveUserWithAliasJdbc() {
+        return jdbcInitPromise.then(r -> userDAO.add(1, "hello")) //
+                              .then(r -> userDAO.findWithAlias(1));
     }
 
     public Promise<Message, Exception> createAndSaveUserRocksDB() {

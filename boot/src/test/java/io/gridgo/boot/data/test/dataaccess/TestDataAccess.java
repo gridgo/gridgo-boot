@@ -1,15 +1,15 @@
-package io.gridgo.boot.data.test;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicReference;
+package io.gridgo.boot.data.test.dataaccess;
 
 import org.joo.promise4j.PromiseException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
+
 import io.gridgo.boot.GridgoApplication;
-import io.gridgo.boot.data.test.data.User;
-import io.gridgo.boot.data.test.data.UserDomainService;
+import io.gridgo.boot.data.test.dataaccess.data.User;
+import io.gridgo.boot.data.test.dataaccess.data.UserDomainService;
 import io.gridgo.boot.support.annotations.EnableComponentScan;
 import io.gridgo.boot.support.annotations.RegistryInitializer;
 import io.gridgo.framework.support.Message;
@@ -33,9 +33,19 @@ public class TestDataAccess {
         var app = GridgoApplication.run(TestDataAccess.class);
         var service = app.getRegistry().lookup(UserDomainService.class.getName(), UserDomainService.class);
         var msg = service.createAndSaveWithDataSource().get();
-        Assert.assertEquals("test", msg.body().asValue().getString());
         app.stop();
+        Assert.assertEquals("test", msg.body().asValue().getString());
     }
+
+    @Test
+    public void testAlias() throws PromiseException, InterruptedException {
+        var app = GridgoApplication.run(TestDataAccess.class);
+        var service = app.getRegistry().lookup(UserDomainService.class.getName(), UserDomainService.class);
+        var user = service.createAndSaveUserWithAliasJdbc().get();
+        app.stop();
+        Assert.assertEquals(1, user.getUserId());
+    }
+
 
     protected void doTest(String gateway) throws InterruptedException {
         var app = GridgoApplication.run(TestDataAccess.class);

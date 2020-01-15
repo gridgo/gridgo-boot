@@ -14,4 +14,12 @@ public @interface Connector {
     String value();
 
     String builder() default "";
+
+    String incomingFormat() default "";
+
+    String outgoingFormat() default "";
+
+    String[] incomingTransformers() default {};
+
+    String[] outgoingTransformers() default {};
 }

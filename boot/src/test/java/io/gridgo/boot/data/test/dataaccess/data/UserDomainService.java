@@ -4,6 +4,8 @@ import org.joo.promise4j.Promise;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 
+import java.util.List;
+
 import io.gridgo.bean.BObject;
 import io.gridgo.boot.data.support.annotations.DataAccessInject;
 import io.gridgo.boot.support.annotations.Component;
@@ -53,6 +55,17 @@ public class UserDomainService {
         return jdbcInitPromise.then(r -> userDAO.add(1, "hello")) //
                               .then(r -> userDAO.findSingle(2)) //
                               .then(r -> userDAO.findSingle(1)) //
+                              .map(Message::ofAny);
+    }
+
+    public Promise<Message, Exception> createAndSaveUserJdbcBatch() {
+        var data = List.of(
+                new User(1, "one"),
+                new User(2, "two"),
+                new User(3, "three")
+        );
+        return jdbcInitPromise.then(r -> userDAO.addBatch(data)) //
+                              .then(r -> userDAO.getAll()) //
                               .map(Message::ofAny);
     }
 

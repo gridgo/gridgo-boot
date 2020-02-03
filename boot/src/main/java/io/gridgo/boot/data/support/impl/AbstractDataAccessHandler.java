@@ -1,9 +1,9 @@
 package io.gridgo.boot.data.support.impl;
 
+import org.joo.promise4j.Promise;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-
-import org.joo.promise4j.Promise;
 
 import io.gridgo.bean.BElement;
 import io.gridgo.boot.data.DataAccessHandler;
@@ -33,7 +33,7 @@ public abstract class AbstractDataAccessHandler<T extends Annotation> implements
         var annotation = method.getAnnotation(annotatedClass);
         if (annotation == null) {
             return Promise.ofCause(new IllegalArgumentException(String.format("Method %s is not annotated with @%s",
-                    proxy.getClass().getName(), method.getName(), annotatedClass.getSimpleName())));
+                    method.getName(), annotatedClass.getSimpleName())));
         }
         var msgRequest = buildMessage(annotation, method, args);
         var msgResult = gateway.call(msgRequest);

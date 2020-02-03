@@ -6,7 +6,9 @@ import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
+import io.gridgo.bean.BArray;
 import io.gridgo.boot.GridgoApplication;
 import io.gridgo.boot.data.test.dataaccess.data.User;
 import io.gridgo.boot.data.test.dataaccess.data.UserDomainService;
@@ -19,13 +21,41 @@ import io.gridgo.framework.support.Registry;
 public class TestDataAccess {
 
     @Test
-    public void testRocksDB() throws InterruptedException {
-        doTest("test_rocksdb");
+    public void testRocksDB() throws Throwable {
+        doTest("test_rocksdb", this::assertSingle);
     }
 
     @Test
-    public void testJdbc() throws InterruptedException {
-        doTest("test_jdbc");
+    public void testJdbc() throws Throwable {
+        doTest("test_jdbc", this::assertSingle);
+    }
+
+    @Test
+    public void testJdbcBatch() throws Throwable {
+        doTest("test_jdbc_batch", this::assertBatch);
+    }
+
+    private void assertSingle(Message r) {
+        User user = r.body().asReference().getReference();
+        Assert.assertEquals(1, user.getId());
+        Assert.assertEquals("hello", user.getName());
+    }
+
+    private void assertBatch(Message r) {
+        BArray users = r.body().asArray();
+        Assert.assertEquals(3, users.size());
+
+        User user = users.getReference(0).getReference();
+        Assert.assertEquals(1, user.getId());
+        Assert.assertEquals("one", user.getName());
+
+        user = users.getReference(1).getReference();
+        Assert.assertEquals(2, user.getId());
+        Assert.assertEquals("two", user.getName());
+
+        user = users.getReference(2).getReference();
+        Assert.assertEquals(3, user.getId());
+        Assert.assertEquals("three", user.getName());
     }
 
     @Test
@@ -46,11 +76,10 @@ public class TestDataAccess {
         Assert.assertEquals(1, user.getUserId());
     }
 
-
-    protected void doTest(String gateway) throws InterruptedException {
+    protected void doTest(String gateway, Consumer<Message> consumer) throws Throwable {
         var app = GridgoApplication.run(TestDataAccess.class);
         var latch = new CountDownLatch(1);
-        var exRef = new AtomicReference<Exception>(null);
+        var exRef = new AtomicReference<Throwable>(null);
 
         app.getContext() //
            .findGatewayMandatory(gateway) //
@@ -60,11 +89,9 @@ public class TestDataAccess {
                    if (e != null) {
                        throw e;
                    } else {
-                       User user = r.body().asReference().getReference();
-                       Assert.assertEquals(1, user.getId());
-                       Assert.assertEquals("hello", user.getName());
+                       consumer.accept(r);
                    }
-               } catch (Exception ex) {
+               } catch (Throwable ex) {
                    exRef.set(ex);
                }
 
@@ -74,10 +101,8 @@ public class TestDataAccess {
         latch.await();
 
         if (exRef.get() != null) {
-            exRef.get().printStackTrace();
+            throw exRef.get();
         }
-
-        Assert.assertNull(exRef.get());
 
         app.stop();
     }

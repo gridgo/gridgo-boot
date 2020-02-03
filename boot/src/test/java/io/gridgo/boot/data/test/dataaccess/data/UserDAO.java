@@ -4,6 +4,7 @@ import org.joo.promise4j.Promise;
 
 import java.util.List;
 
+import io.gridgo.boot.data.jdbc.BindBatch;
 import io.gridgo.boot.data.jdbc.JdbcProduce;
 import io.gridgo.boot.data.support.annotations.DataAccess;
 import io.gridgo.boot.data.support.annotations.PojoMapper;
@@ -22,6 +23,9 @@ public interface UserDAO {
     @JdbcProduce("insert into test_users (id, name) values (:1, :2)")
     public Promise<Message, Exception> add(int id, String name);
 
+    @JdbcProduce(value = "insert into test_users (id, name) values (:id, :name)", batch = true)
+    public Promise<Message, Exception> addBatch(@BindBatch List<User> users);
+
     @PojoMapper(User.class)
     @JdbcProduce(value = "select * from test_users where id = :1")
     public Promise<List<User>, Exception> find(int id);
@@ -39,4 +43,8 @@ public interface UserDAO {
     @SingleMapper
     @JdbcProduce(value = "select id as userId from test_users where id = :1")
     public Promise<ModifiedUser, Exception> findWithAlias(int id);
+
+    @PojoMapper(User.class)
+    @JdbcProduce(value = "select * from test_users")
+    public Promise<List<User>, Exception> getAll();
 }
